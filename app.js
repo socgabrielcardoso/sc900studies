@@ -63,7 +63,7 @@ function topStats(){
   $('#sound-toggle').textContent=state.sound?'🔊':'🔇';
   $$('.nav-link,.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
 }
-function progressBar(percent){return '<div class="mini-progress"><div style="width:'+Math.max(0,Math.min(100,percent))+'%"></div></div>'}
+function progressBar(percent){return '<div class="mini-progress"><div data-progress="'+Math.max(0,Math.min(100,percent))+'"></div></div>'}
 function domainsMarkup(){return Object.entries(DOMAIN).map(([k,d])=>'<article class="domain-card"><div class="domain-top"><span class="domain-icon">'+d.icon+'</span><span class="domain-percent">'+domainScore(k)+'%</span></div><div class="domain-name">'+esc(d.short)+'</div>'+progressBar(domainScore(k))+'<small>Peso no edital: '+d.weight+'% (referência)</small></article>').join('')}
 function source(){return '<div class="source-line">Treinamento independente, perguntas autorais. Edital oficial Microsoft: <a href="'+OFFICIAL_GUIDE+'" target="_blank" rel="noopener noreferrer">guia SC-900 ↗</a>. Atualização anunciada para 21/10/2026. Percentuais são faixas; os pesos exibidos servem apenas para orientar o estudo. Nota interna ≠ nota oficial (700 pontos escalonados).</div>'}
 function pageIntro(eyebrow,title,desc){return '<div class="page-intro"><div><div class="eyebrow">'+eyebrow+'</div><h1>'+title+'</h1><p>'+desc+'</p></div></div>'}
@@ -74,7 +74,7 @@ function renderHome(){
   '<div class="section-header"><h2>🚀 Sua próxima missão</h2><button class="text-link" data-view="journey">Ver mapa completo →</button></div>'+
   '<div class="mission-card"><div class="mission-emoji">'+day.emoji+'</div><div class="mission-text"><span class="pill">'+(day.boss?'CHEFÃO':'DIA '+pad(cd))+'</span><div><strong>'+esc(day.title)+'</strong></div><p>'+day.topics.map(x=>BY_ID[x]?.name||'').join(' • ')+'</p></div><button class="btn small mission-cta" data-act="open-day" data-day="'+cd+'">Entrar na missão →</button></div>'+
   '<div class="section-header"><h2>📊 Seu domínio da certificação</h2><button class="text-link" data-view="stats">Ver desempenho →</button></div><div class="domain-grid">'+domainsMarkup()+'</div>'+
-  '<div class="level-banner"><div><strong>🛡️ Nível '+level()+' · '+(level()<5?'Cadete':level()<12?'Analista SOC':'Guardião da nuvem')+'</strong><p>'+(state.xp%200)+' / 200 XP até o próximo nível</p></div><div style="width:34%">'+progressBar((state.xp%200)/2)+'</div></div>'+source();
+  '<div class="level-banner"><div><strong>🛡️ Nível '+level()+' · '+(level()<5?'Cadete':level()<12?'Analista SOC':'Guardião da nuvem')+'</strong><p>'+(state.xp%200)+' / 200 XP até o próximo nível</p></div><div class="level-meter">'+progressBar((state.xp%200)/2)+'</div></div>'+source();
 }
 function pathCards(){
   return DAYS.map(d=>{
@@ -98,30 +98,30 @@ function renderDay(d){
  '<section class="day-header"><div class="big-emoji">'+day.emoji+'</div><div><div class="eyebrow">'+(day.boss?'ENCONTRO COM O CHEFÃO':'MISSÃO '+pad(d)+' · '+day.tier.toUpperCase())+'</div><h1>'+esc(day.title)+'</h1><p>Três fases. Uma empresa para proteger. '+(coming?'Volte no dia correspondente ou habilite Maratona livre.':'Você decide a resposta.')+'</p></div></section>'+
  '<div class="story-bubble"><div class="story-avatar">'+face(name)+'</div><div><strong>'+name+' · '+man.role+'</strong><p>'+man.tone+' '+(day.boss?'O conselho quer uma auditoria completa.':BY_ID[day.topics[0]].incident)+'</p></div></div>'+
  '<div class="section-header"><h2>🎮 Escolha sua fase</h2><span class="pill">'+[1,2,3].filter(p=>state.completed.includes(d+'-'+p)).length+'/3 concluídas</span></div><div class="daily-layout">'+[1,2,3].map(p=>phaseCard(d,p)).join('')+'</div>'+
- '<div class="section-header" style="margin-top:26px"><h2>🧠 Palavras-chave</h2></div><div class="word-cloud">'+day.topics.map(id=>'<span class="term-badge">'+esc(BY_ID[id].name)+'</span>').join('')+'</div>'+
+ '<div class="section-header mt26"><h2>🧠 Palavras-chave</h2></div><div class="word-cloud">'+day.topics.map(id=>'<span class="term-badge">'+esc(BY_ID[id].name)+'</span>').join('')+'</div>'+
  (coming?'<div class="notice">🔒 A jornada acompanha o calendário. Ative <strong>Maratona livre</strong> em Meu progresso caso queira estudar adiantado.</div>':'')+source();
 }
 function renderRight(){
  const active=dueCards(),m=MENTORS.Camila;
  return '<div class="right-box"><div class="eyebrow">STATUS DA SUA OFENSIVA</div><div class="right-streak">🔥<strong>'+state.streak+' dias</strong><p>'+(!state.lastStudy?'Comece uma fase para acender sua chama.':state.lastStudy===dateLocal()?'Missão do dia registrada!':'Estude hoje para manter sua chama.')+'</p></div><div class="small-divider"></div><div class="micro-label">🧊 Bloqueios disponíveis: '+state.freezes+'</div>'+progressBar(Math.min(100,state.streak/7*100))+'</div>'+
  '<div class="right-box"><h3>👥 Sua equipe SOC</h3>'+Object.entries(MENTORS).map(([name,mn])=>'<div class="mentor-inline"><span class="mentor-face">'+face(name)+'</span><div><strong>'+name+'</strong><small>'+mn.role+'</small></div></div>').join('')+'</div>'+
- '<div class="right-box"><h3>🎯 Treino inteligente</h3><p>'+(active.length?'Há '+active.length+' conceito(s) que precisam de revisão hoje.':'Os erros serão agendados para revisão nos próximos dias.')+'</p><div class="daily-task"><span class="micro-label">SEU FOCO</span><div><strong>'+esc(active[0]?.name||'Fixar cada conceito')+'</strong></div>'+progressBar(readiness())+'</div><button class="btn small block secondary" data-view="lab" style="margin-top:14px">Revisar agora →</button></div>';
+ '<div class="right-box"><h3>🎯 Treino inteligente</h3><p>'+(active.length?'Há '+active.length+' conceito(s) que precisam de revisão hoje.':'Os erros serão agendados para revisão nos próximos dias.')+'</p><div class="daily-task"><span class="micro-label">SEU FOCO</span><div><strong>'+esc(active[0]?.name||'Fixar cada conceito')+'</strong></div>'+progressBar(readiness())+'</div><button class="btn small block secondary mt14" data-view="lab">Revisar agora →</button></div>';
 }
 function renderLab(){
  const due=dueCards(),weak=weakCards(),all=state.history.length;
  return pageIntro('LABORATÓRIO DO SOC','Treino inteligente ⚡','Desafios curtos que adaptam a revisão aos conceitos com maior dificuldade.')+
  '<div class="rank-banner"><div class="rank-icon">🧠</div><div><h2>'+due.length+' revisões prontas</h2><p>Quando você erra, o mesmo conceito volta em um novo cenário após 1, 3, 7 ou 14 dias.</p></div></div>'+
  '<div class="daily-layout"><button class="phase-card" data-act="start-quick" data-mode="due"><span class="phase-icon">🔁</span><strong>Minha revisão</strong><small>'+(due.length?due.length+' cartões vencidos':'Revisão dos conceitos mais recentes')+'</small><span class="status">INICIAR →</span></button><button class="phase-card" data-act="start-quick" data-mode="weak"><span class="phase-icon">🎯</span><strong>Caça aos erros</strong><small>'+weak.length+' conceitos para fortalecer</small><span class="status">INICIAR →</span></button><button class="phase-card" data-act="start-quick" data-mode="random"><span class="phase-icon">🎲</span><strong>Simulado surpresa</strong><small>10 questões de todos os pilares</small><span class="status">INICIAR →</span></button></div>'+
- '<div class="section-header" style="margin-top:30px"><h2>🩺 Diagnóstico</h2></div><div class="domain-grid">'+domainsMarkup()+'</div>'+
+ '<div class="section-header mt30"><h2>🩺 Diagnóstico</h2></div><div class="domain-grid">'+domainsMarkup()+'</div>'+
  (weak.length?'<div class="section-header"><h2>🔍 Seus pontos fracos</h2></div><div class="list-tiles">'+weak.slice(0,6).map(x=>'<div class="tile"><div class="eyebrow">'+DOMAIN[x.domain].icon+' '+DOMAIN[x.domain].short+'</div><h3>'+esc(x.name)+'</h3><p>'+esc(x.tip)+'</p></div>').join('')+'</div>':'<div class="empty-state">✨ Resolva seus primeiros desafios para receber revisões personalizadas.</div>')+source();
 }
 function renderNotes(){
  const weak=weakCards(),entries=Object.entries(state.notes||{}).filter(([,v])=>v?.trim());
  return pageIntro('MEMÓRIA OPERACIONAL','Seu caderno de bordo 📓','Anote com suas palavras. As notas e os erros ficam apenas neste navegador.')+
- '<div class="note-card"><label class="label-block" for="note-topic">Nova anotação por assunto</label><select class="name-input" id="note-topic" aria-label="Conceito para anotar">'+BANK.map(c=>'<option value="'+c.id+'">'+DOMAIN[c.domain].icon+' '+esc(c.name)+'</option>').join('')+'</select><label class="label-block" for="note-editor" style="margin-top:15px">O que você aprendeu?</label><textarea id="note-editor" class="note-input" maxlength="2000" placeholder="Ex.: Sentinel é SIEM/SOAR; Defender XDR cruza alertas de várias soluções."></textarea><button class="btn small" data-act="save-note">💾 Salvar anotação</button></div>'+
- '<div class="section-header" style="margin-top:27px"><h2>📝 Anotações salvas</h2><span class="pill">'+entries.length+'</span></div>'+
- (entries.length?'<div class="notes-layout">'+entries.map(([id,v])=>'<div class="note-card"><div class="eyebrow">'+esc(BY_ID[id]?.name||id)+'</div><p style="white-space:pre-wrap;color:#d8e7fa;margin:10px 0">'+esc(v)+'</p><button class="btn small ghost" data-act="edit-note" data-topic="'+esc(id)+'">Editar</button> <button class="btn small ghost" data-act="remove-note" data-topic="'+esc(id)+'">Excluir</button></div>').join('')+'</div>':'<div class="empty-state"><div class="empty-icon">📓</div>Seu primeiro insight aparecerá aqui.</div>')+
- '<div class="section-header" style="margin-top:27px"><h2>🧯 Histórico de dificuldades</h2></div>'+
+ '<div class="note-card"><label class="label-block" for="note-topic">Nova anotação por assunto</label><select class="name-input" id="note-topic" aria-label="Conceito para anotar">'+BANK.map(c=>'<option value="'+c.id+'">'+DOMAIN[c.domain].icon+' '+esc(c.name)+'</option>').join('')+'</select><label class="label-block mt15" for="note-editor">O que você aprendeu?</label><textarea id="note-editor" class="note-input" maxlength="2000" placeholder="Ex.: Sentinel é SIEM/SOAR; Defender XDR cruza alertas de várias soluções."></textarea><button class="btn small" data-act="save-note">💾 Salvar anotação</button></div>'+
+ '<div class="section-header mt27"><h2>📝 Anotações salvas</h2><span class="pill">'+entries.length+'</span></div>'+
+ (entries.length?'<div class="notes-layout">'+entries.map(([id,v])=>'<div class="note-card"><div class="eyebrow">'+esc(BY_ID[id]?.name||id)+'</div><p class="note-body">'+esc(v)+'</p><button class="btn small ghost" data-act="edit-note" data-topic="'+esc(id)+'">Editar</button> <button class="btn small ghost" data-act="remove-note" data-topic="'+esc(id)+'">Excluir</button></div>').join('')+'</div>':'<div class="empty-state"><div class="empty-icon">📓</div>Seu primeiro insight aparecerá aqui.</div>')+
+ '<div class="section-header mt27"><h2>🧯 Histórico de dificuldades</h2></div>'+
  (weak.length?'<div class="list-tiles">'+weak.slice(0,12).map(c=>'<div class="tile"><h3>'+esc(c.name)+'</h3><p>'+esc(c.tip)+'</p><small class="muted">Erros: '+state.topics[c.id].wrong+' · Próxima revisão: '+esc(state.topics[c.id].due||'—')+'</small></div>').join('')+'</div>':'<p>Os assuntos em que você errar aparecerão automaticamente aqui.</p>')+source();
 }
 function renderShop(){
@@ -135,24 +135,25 @@ function renderStats(){
  const done=state.completed.length;let most=weakCards()[0];
  return pageIntro('INTELIGÊNCIA DE ESTUDO','Seu desempenho 📊','Acompanhe sua precisão e suas fragilidades — com métricas de treino, não de aprovação oficial.')+
  '<div class="rank-banner"><div class="rank-icon">'+(done>=90?'👑':done>=45?'🛡️':'🎖️')+'</div><div><div class="eyebrow">PATENTE ATUAL</div><h2>'+ (done>=90?'Guardião oficial da Academia':done>=45?'Especialista SOC':'Cadete de segurança')+'</h2><p>Nível '+level()+' · '+state.xp+' XP · '+done+' / 90 fases</p></div></div>'+
- '<div class="analytics-row"><div class="analytics-card"><small>Precisão das respostas</small><strong>'+accuracy()+'%</strong></div><div class="analytics-card"><small>Índice de preparo no treino</small><strong>'+readiness()+'%</strong></div><div class="analytics-card"><small>Respostas registradas</small><strong>'+state.history.length+'</strong></div><div class="analytics-card"><small>Maior desafio atual</small><strong style="font-size:16px">'+esc(most?.name||'Ainda não identificado')+'</strong></div></div>'+
- '<div class="section-header" style="margin-top:30px"><h2>📈 Proficiência por domínio</h2></div><div class="domain-grid">'+domainsMarkup()+'</div>'+
+ '<div class="analytics-row"><div class="analytics-card"><small>Precisão das respostas</small><strong>'+accuracy()+'%</strong></div><div class="analytics-card"><small>Índice de preparo no treino</small><strong>'+readiness()+'%</strong></div><div class="analytics-card"><small>Respostas registradas</small><strong>'+state.history.length+'</strong></div><div class="analytics-card"><small>Maior desafio atual</small><strong class="stats-small">'+esc(most?.name||'Ainda não identificado')+'</strong></div></div>'+
+ '<div class="section-header mt30"><h2>📈 Proficiência por domínio</h2></div><div class="domain-grid">'+domainsMarkup()+'</div>'+
  '<div class="section-header"><h2>🏆 Conquistas</h2></div><div class="badge-grid">'+MILESTONES.map(m=>'<div class="achievement '+(m.test(state)?'':'locked')+'"><div class="emoji">'+m.emoji+'</div><strong>'+m.name+'</strong></div>').join('')+'</div>'+
  (state.lastBossScore?'<div class="notice">⚔️ Último chefão: '+state.lastBossScore+'% de precisão. Meta de treino recomendada: 80%+ e consistência em todos os domínios.</div>':'')+source();
 }
 function renderProfile(){
  return pageIntro('CONFIGURAÇÕES DA ACADEMIA','Meu progresso ⚙️','Controle seus estudos, privacidade e ritmo. Seu progresso pertence a você.')+
- '<div class="note-card"><label class="label-block" for="profile-name">Como a equipe chama você?</label><input id="profile-name" class="name-input" maxlength="32" value="'+esc(state.name)+'"><div style="margin-top:13px"><button class="btn small" data-act="save-name">Salvar apelido</button></div></div>'+
- '<div class="toggle-row"><div><strong>🚀 Maratona livre</strong><p style="margin:0;font-size:12px">Desbloqueie os próximos dias sem esperar o calendário (continua exigindo concluir a fase anterior).</p></div><input type="checkbox" class="switch" id="marathon" '+(state.marathon?'checked':'')+' aria-label="Habilitar maratona livre"></div>'+
+ '<div class="note-card"><label class="label-block" for="profile-name">Como a equipe chama você?</label><input id="profile-name" class="name-input" maxlength="32" value="'+esc(state.name)+'"><div class="mt13"><button class="btn small" data-act="save-name">Salvar apelido</button></div></div>'+
+ '<div class="toggle-row"><div><strong>🚀 Maratona livre</strong><p class="no-margin-small">Desbloqueie os próximos dias sem esperar o calendário (continua exigindo concluir a fase anterior).</p></div><input type="checkbox" class="switch" id="marathon" '+(state.marathon?'checked':'')+' aria-label="Habilitar maratona livre"></div>'+
  '<div class="notice">🔒 <strong>Privacidade:</strong> progresso, respostas e notas ficam no armazenamento local deste navegador. Não existe conta, IA remota nem sincronização em nuvem. Faça backups para evitar perder tudo ao limpar dados.</div>'+
  '<div class="note-card"><h3>💾 Backup do progresso</h3><p>Exporte suas missões para um arquivo JSON ou importe um backup anterior.</p><div class="profile-controls"><button class="btn secondary" data-act="export">⬇ Exportar JSON</button><button class="btn secondary" data-act="import">⬆ Importar JSON</button><input type="file" id="import-file" accept="application/json,.json" hidden></div></div>'+
- '<div class="note-card" style="margin-top:16px"><h3>🧹 Reiniciar jornada</h3><p>Apaga todos os dados locais deste jogo neste navegador. Não pode ser desfeito sem backup.</p><button class="btn small ghost" data-act="reset">Excluir meu progresso</button></div>'+source();
+ '<div class="note-card mt16"><h3>🧹 Reiniciar jornada</h3><p>Apaga todos os dados locais deste jogo neste navegador. Não pode ser desfeito sem backup.</p><button class="btn small ghost" data-act="reset">Excluir meu progresso</button></div>'+source();
 }
+function applyBars(){$('[data-progress]').forEach(el=>{el.style.width=el.dataset.progress+'%'})}
 function render(){
  if(session)return;
  topStats(); const main=$('#main-content');
  main.innerHTML=view==='home'?renderHome():view==='journey'?renderJourney():view==='lab'?renderLab():view==='notes'?renderNotes():view==='shop'?renderShop():view==='stats'?renderStats():view==='profile'?renderProfile():view==='day'?renderDay(selectedDay):renderHome();
- $('#rightbar').innerHTML=renderRight();
+ $('#rightbar').innerHTML=renderRight();applyBars();
 }
 function go(v){if(session)return;view=v;render();window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})}
 function chooseDay(d){selectedDay=d;go('day')}
@@ -227,10 +228,11 @@ function drawQuestion(){
  const progress=Math.round(s.index/s.questions.length*100);
  const tip=session.answered?'<div class="quiz-feedback '+(session.latestCorrect?'good':'bad')+'"><strong>'+(session.latestCorrect?'✅ Excelente defesa!':'🔎 Essa brecha passou. Observe:')+'</strong><p>'+esc(q.tip||'Revise esse conceito antes da próxima missão.')+' '+(!session.latestCorrect?'Resposta: '+esc(q.correct||'relacione os termos'):'')+'</p></div>':'';
  $('#modal').innerHTML='<div class="quiz-dialog" role="dialog" aria-modal="true" aria-labelledby="quiz-heading"><div class="quiz-top"><div><div class="eyebrow">'+(s.mode==='phase'?'DIA '+pad(s.day)+' · FASE '+s.phase:'LABORATÓRIO · TREINO')+'</div><strong id="quiz-heading">'+(s.mode==='phase'?esc(d.title):'Revisão personalizada')+'</strong></div><button class="exit-btn" data-act="quit" aria-label="Sair da fase">×</button></div>'+
- '<div class="quiz-meta"><span>Questão '+(s.index+1)+' / '+s.questions.length+'</span><span>'+s.correct+' acertos'+(s.endsAt?'<span class="quiz-timer" style="margin-left:10px">⏳ <b id="seconds-left">'+countdown()+'s</b></span>':'')+'</span></div><div class="progress-track quiz-progress"><div style="width:'+progress+'%"></div></div>'+
+ '<div class="quiz-meta"><span>Questão '+(s.index+1)+' / '+s.questions.length+'</span><span>'+s.correct+' acertos'+(s.endsAt?'<span class="quiz-timer ml10">⏳ <b id="seconds-left">'+countdown()+'s</b></span>':'')+'</span></div><div class="progress-track quiz-progress"><div data-progress="'+progress+'"></div></div>'+
  '<div class="quiz-mentor"><div class="mentor-emoji">'+face(mn)+'</div><p><strong>'+mn+':</strong> '+(q.type==='match'?'Vamos conectar as peças. Nomes primeiro, conceito depois.':q.tag==='CONSERTE A BRECHA'?'Decida qual defesa aplicar. Sem pânico, com método.':'Leia o cenário. Encontre o recurso certo.')+'</p></div>'+
  '<div class="question-type">'+q.tag+'</div><div class="quiz-prompt">'+esc(q.prompt)+'</div>'+questionHTML(q)+tip+
  '<div class="quiz-bottom"><small>💚 '+state.hearts+' vidas · 🪙 '+state.coins+'</small>'+(s.answered?'<button class="btn small" data-act="next">CONTINUAR →</button>':'<span class="muted">Selecione sua resposta</span>')+'</div></div>';
+ applyBars();
 }
 function recordAttempt(id,correct){
  studyToday();
@@ -282,7 +284,7 @@ function finishSession(timeout=false,outOfHearts=false){
  const title=success?'MISSÃO CUMPRIDA!':'MISSÃO INCOMPLETA';
  const line=timeout?'O relógio zerou. Treine e tente outra vez.':outOfHearts?'Suas vidas acabaram. Recupere um escudo para continuar.':success?'A nuvem está mais segura graças a você.':'Reveja as brechas e tente novamente. Precisão mínima: '+threshold+'%.';
  $('#modal').innerHTML='<div class="popup-dialog" role="dialog" aria-modal="true" aria-labelledby="result-title"><div class="eyebrow">'+(success?'CERTIFICADO DA MISSÃO':'RELATÓRIO DO SOC')+'</div><div class="popup-emoji">'+(success?'🏆':timeout?'⏳':'💪')+'</div><h2 id="result-title">'+title+'</h2><p>'+line+'</p><div class="summary-grid"><div class="summary-card"><div class="label">Precisão</div><strong>'+percent+'%</strong></div><div class="summary-card"><div class="label">Acertos</div><strong>'+s.correct+'/'+s.questions.length+'</strong></div><div class="summary-card"><div class="label">SecCoins</div><strong>+'+reward+'</strong></div></div>'+
- '<div class="btn-row" style="justify-content:center"><button class="btn" data-act="result-close">'+(success?'CONTINUAR JORNADA':'VOLTAR À MISSÃO')+'</button>'+(!success&&state.hearts>0?'<button class="btn secondary" data-act="retry" data-day="'+s.day+'" data-phase="'+s.phase+'" data-mode="'+s.mode+'" data-quick="'+s.quick+'">Tentar novamente</button>':'')+'</div></div>';
+ '<div class="btn-row justify-center"><button class="btn" data-act="result-close">'+(success?'CONTINUAR JORNADA':'VOLTAR À MISSÃO')+'</button>'+(!success&&state.hearts>0?'<button class="btn secondary" data-act="retry" data-day="'+s.day+'" data-phase="'+s.phase+'" data-mode="'+s.mode+'" data-quick="'+s.quick+'">Tentar novamente</button>':'')+'</div></div>';
  if(firstTime&&state.completed.length===90)notify('👑 Todas as 90 fases concluídas! Agora teste sua consistência no simulado.');
 }
 function closeModal(){clearInterval(ticker);session=null;$('#modal').innerHTML='';render()}
