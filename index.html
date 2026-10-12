@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d21">
+<meta name="description" content="SC-900 Security Academy: 30 dias, 90 missões, exercícios rápidos, recompensas e repetição espaçada para dominar os fundamentos de segurança Microsoft.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/styles.css">
+<title>SC-900 Security Academy · Torne-se um Guardião</title>
+</head>
+<body>
+<div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+<div id="app">
+<header class="topbar">
+  <a href="#" class="brand" data-view="home" aria-label="Ir para início"><span class="brand-mark">✦</span><span class="brand-title">SECURITY<span>ACADEMY</span><small>MISSÃO SC-900</small></span></a>
+  <div class="top-actions">
+    <div class="stat-chip flame" title="Dias consecutivos"><span>🔥</span><strong id="top-streak">0</strong><span class="chip-label">ofensiva</span></div>
+    <div class="stat-chip coins" title="SecCoins"><span>🪙</span><strong id="top-coins">0</strong><span class="chip-label">SecCoins</span></div>
+    <div class="stat-chip hearts" title="Vidas restantes"><span>💚</span><strong id="top-hearts">5</strong></div>
+    <button type="button" class="sound-toggle" id="sound-toggle" aria-label="Alternar sons" title="Alternar efeitos sonoros">🔇</button>
+    <button type="button" class="user-chip" data-view="profile" title="Meu progresso"><span>🧑‍🚀</span></button>
+  </div>
+</header>
+<div class="app-layout">
+  <aside class="sidebar" aria-label="Menu">
+    <p class="nav-heading">CENTRAL DE COMANDO</p>
+    <nav id="main-nav">
+      <button class="nav-link active" data-view="home"><span>🏠</span><span>Visão geral</span></button>
+      <button class="nav-link" data-view="journey"><span>🗺️</span><span>Jornada</span></button>
+      <button class="nav-link" data-view="lab"><span>⚡</span><span>Treino rápido</span></button>
+      <button class="nav-link" data-view="notes"><span>📓</span><span>Caderno</span></button>
+      <button class="nav-link" data-view="shop"><span>🛍️</span><span>Arsenal</span></button>
+      <button class="nav-link" data-view="stats"><span>📊</span><span>Estatísticas</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="mini-shield">🛡️</div><strong>Seu SOC pessoal</strong><p>Uma missão por vez. Proteja a nuvem, domine a prova.</p>
+      <div class="sidebar-foot"><span class="dot"></span> SISTEMA OPERACIONAL</div>
+    </div>
+  </aside>
+  <main id="main-content" tabindex="-1" aria-live="polite"></main>
+  <aside class="rightbar" id="rightbar" aria-label="Informações complementares"></aside>
+</div>
+<nav class="bottom-nav" aria-label="Navegação rápida">
+  <button data-view="home">🏠<small>Início</small></button>
+  <button data-view="journey">🗺️<small>Jornada</small></button>
+  <button data-view="lab">⚡<small>Treino</small></button>
+  <button data-view="notes">📓<small>Notas</small></button>
+  <button data-view="shop">🛍️<small>Loja</small></button>
+</nav>
+</div>
+<div id="modal" class="modal-layer" aria-live="polite"></div>
+<div id="toast-layer" class="toast-layer" role="status" aria-live="polite"></div>
+<div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
