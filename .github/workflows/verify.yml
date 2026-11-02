@@ -18,5 +18,6 @@ jobs:
         run: |
           node --check app.js
           node --check content.js
+          node --check progress-state.js
       - name: Curriculum and security tests
-        run: node --test tests/content.test.mjs
+        run: node --test tests/*.test.mjs
