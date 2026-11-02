@@ -1,6 +1,9 @@
 import {BANK,BY_ID,DAYS,DOMAIN,MENTORS,SHOP,MILESTONES,OFFICIAL_GUIDE} from './content.js';
+import {normalizeProgress} from './progress-state.js';
 
 const KEY='sc900-academy-v1';
+const VALID_IDS=BANK.map(item=>item.id);
+const SKIN_IDS=SHOP.filter(item=>item.kind==='skin').map(item=>item.id);
 const $=(sel,root=document)=>root.querySelector(sel);
 const $$=(sel,root=document)=>Array.from(root.querySelectorAll(sel));
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13,11 +16,10 @@ const fresh=()=>({version:1,name:'Chefe',startDate:dateLocal(),streak:0,lastStud
 function load(){
   try{
     const data=JSON.parse(localStorage.getItem(KEY)||'null');
-    if(data&&data.version===1&&Array.isArray(data.completed)&&typeof data.topics==='object'&&data.topics!==null){
-      return Object.assign(fresh(),data);
-    }
-  }catch(e){}
-  return fresh();
+    return normalizeProgress(data,fresh(),VALID_IDS,SKIN_IDS);
+  }catch(e){
+    return fresh();
+  }
 }
 let state=load(),view='home',selectedDay=1,session=null,ticker=null,saving=false;
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){notify('O navegador não conseguiu salvar o progresso.',true)}};
@@ -306,15 +308,10 @@ function importData(file){
  if(!file||file.size>2_000_000){notify('Arquivo inválido ou maior que 2 MB.',true);return}
  const reader=new FileReader();reader.onload=()=>{
   try{const obj=JSON.parse(reader.result);
-   if(obj.version!==1||!Array.isArray(obj.completed)||typeof obj.topics!=='object'||typeof obj.notes!=='object'||!Number.isFinite(obj.xp)||!Number.isFinite(obj.coins))throw Error('Formato');
+   if(!obj||obj.version!==1||!Array.isArray(obj.completed)||!obj.topics||typeof obj.topics!=='object'||!obj.notes||typeof obj.notes!=='object')throw Error('Formato');
+   const restored=normalizeProgress(obj,fresh(),VALID_IDS,SKIN_IDS);
    if(!window.confirm('Substituir TODO o seu progresso local pelo conteúdo do backup?'))return;
-   state=Object.assign(fresh(),obj);
-   state.completed=state.completed.filter(x=>/^(?:[1-9]|[12]\d|30)-[123]$/.test(x));
-   state.coins=Math.max(0,Math.min(100000,state.coins));state.xp=Math.max(0,Math.min(10000000,state.xp));
-   state.hearts=Math.max(0,Math.min(5,Number(state.hearts)||0));
-   state.name=String(state.name).slice(0,32);
-   state.history=Array.isArray(state.history)?state.history.slice(-3000):[];
-   state.inventory=Array.isArray(state.inventory)?state.inventory.filter(x=>SHOP.some(i=>i.id===x&&i.kind==='skin')):[];
+   state=restored;
    save();todaySetup();go('home');notify('Backup importado!');
   }catch(e){notify('Não foi possível ler esse backup.',true)}
  };reader.readAsText(file);
