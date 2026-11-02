@@ -1,7 +1,7 @@
 // Validate untrusted browser storage and imported backup JSON before the UI reads it.
 // Keep this module DOM-free so malformed state can be regression-tested in Node.
 const dateValid = value => {
-  if (typeof value !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false;
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const date = new Date(value + 'T00:00:00Z');
   return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
 };
@@ -30,7 +30,7 @@ export function normalizeProgress(raw, defaults, validIds, skinIds) {
 
   state.completed = Array.isArray(raw.completed)
     ? [...new Set(raw.completed.filter(x => typeof x === 'string' &&
-      /^(?:[1-9]|[12]\\d|30)-[123]$/.test(x)))].slice(0, 90) : [];
+      /^(?:[1-9]|[12]\d|30)-[123]$/.test(x)))].slice(0, 90) : [];
   state.inventory = Array.isArray(raw.inventory)
     ? [...new Set(raw.inventory.filter(x => typeof x === 'string' && skins.has(x)))] : [];
 
